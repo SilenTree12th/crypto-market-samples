@@ -66,7 +66,7 @@ while len(candles) < len(symbols):
 print('Calculating EMAs...')
 for sym in candles:
     for period in EMA_PERIODS:
-        iEMA = EMA([period])
+        iEMA = EMA(period)
         lst_candles = candles[sym][:]
         for c in lst_candles:
             iEMA.add(c['close'])
@@ -85,12 +85,14 @@ for sym in ema_values:
     # save good symbols
         f = open('results/good.txt', 'a')
         #entry = '%s: $%s\n' %(sym, round(price,3))
-        entry = '%s: $%s\n' %(sym)
+        entry = '%s'
+        entry = [:-4]
         f.write(entry)
     elif price < ema_96 and price < ema_288:
     # save bad symbols
         f = open('results/bad.txt', 'a')
-        entry = '%s: $%s\n' %(sym)
+        entry = '%s'
+        entry = entry[:-4]
         f.write(entry)
     f.close()
     del f # cleanup
