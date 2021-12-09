@@ -86,7 +86,7 @@ for sym in ema_values:
         f = open('results/good.txt', 'a')
         #entry = '%s: $%s\n' %(sym, round(price,3))
         entry = '%s'
-        entry = [:-4]
+        entry = entry[:-4]
         f.write(entry + '\n')
     elif price < ema_96 and price < ema_288:
     # save bad symbols
