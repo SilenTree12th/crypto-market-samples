@@ -22,7 +22,7 @@ def load_candles(sym):
             'interval': '15m',
             'limit': 250
     }
-    resp = requests.get(BASE_URL + '/api/v1/klines', params=payload)
+    resp = requests.get(BASE_URL + '/api/v3/klines', params=payload)
     klines = json.loads(resp.content)
     # parse klines and store open, high, low, close and vol only
     parsed_klines = []
@@ -48,7 +48,7 @@ open('results/bad.txt', 'w').close()
 
 # load symbols information
 print('Getting list of BTC trade pairs...')
-resp = requests.get(BASE_URL + '/api/v1/ticker/allBookTickers')
+resp = requests.get(BASE_URL + '/api/v3/ticker/bookTicker')
 tickers_list = json.loads(resp.content)
 for ticker in tickers_list:
     if str(ticker['symbol'])[-4:] == 'USDT':
@@ -87,13 +87,13 @@ for sym in ema_values:
         #entry = '%s: $%s\n' %(sym, round(price,3))
         entry = '%s'
         entry = [:-4]
-        f.write(entry)
+        f.write(entry + '\n')
     elif price < ema_96 and price < ema_288:
     # save bad symbols
         f = open('results/bad.txt', 'a')
         entry = '%s'
         entry = entry[:-4]
-        f.write(entry)
+        f.write(entry + '\n')
     f.close()
     del f # cleanup
 
