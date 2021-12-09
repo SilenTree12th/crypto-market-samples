@@ -7,8 +7,8 @@ from bfxhfindicators import EMA
 
 BASE_URL = 'https://api.binance.com'
 
-TIMEFRAME = '4h'
-EMA_PERIODS = [50, 200]
+TIMEFRAME = '15m'
+EMA_PERIODS = [96, 288]
 
 symbols = []
 candles = {}
@@ -19,7 +19,7 @@ def load_candles(sym):
     global candles, prices, BASE_URL
     payload = {
             'symbol': sym,
-            'interval': '4h',
+            'interval': '15m',
             'limit': 250
     }
     resp = requests.get(BASE_URL + '/api/v1/klines', params=payload)
@@ -43,9 +43,8 @@ def load_candles(sym):
 if not os.path.exists('results/'):
     os.makedirs('results/')
 # start with blank files
-open('results/below_50.txt', 'w').close()
-open('results/above_50_below_200.txt', 'w').close()
-open('results/above_200.txt', 'w').close()
+open('results/good.txt', 'w').close()
+open('results/bad.txt', 'w').close()
 
 # load symbols information
 print('Getting list of BTC trade pairs...')
@@ -55,7 +54,7 @@ for ticker in tickers_list:
     if str(ticker['symbol'])[-4:] == 'USDT':
         symbols.append(ticker['symbol'])
 
-# get 4h candles for symbols
+# get 15m candles for symbols
 print('Loading candle data for symbols...')
 for sym in symbols:
     Thread(target=load_candles, args=(sym,)).start()
@@ -78,24 +77,20 @@ for sym in candles:
 # save filtered EMA results in txt files
 print('Saving filtered EMA results to txt files...')
 for sym in ema_values:
-    ema_50 = ema_values[sym][50]
-    ema_200 = ema_values[sym][200]
+    ema_96 = ema_values[sym][96]
+    ema_288 = ema_values[sym][288]
     price = prices[sym]
     entry = ''
-    if price < ema_50:
-    # save symbols trading below EMA (50)
-        f = open('results/below_50.txt', 'a')
-        entry = '%s: $%s\n' %(sym, round(price,3))
+    if price < ema_288 and price > ema_96 or price > ema_288:
+    # save good symbols
+        f = open('results/good.txt', 'a')
+        #entry = '%s: $%s\n' %(sym, round(price,3))
+        entry = '%s: $%s\n' %(sym)
         f.write(entry)
-    elif price > ema_50 and price < ema_200:
-    # save symbols trading above EMA(200)
-        f = open('results/above_50_below_200.txt', 'a')
-        entry = '%s: $%s\n' %(sym, round(price,3))
-        f.write(entry)
-    elif price > ema_200:
-    # save symbols trading above EMA(50) but below EMA(200)
-        f = open('results/above_200.txt', 'a')
-        entry = '%s: $%s\n' %(sym, round(price,3))
+    elif price < ema_96 and price < ema_288:
+    # save bad symbols
+        f = open('results/bad.txt', 'a')
+        entry = '%s: $%s\n' %(sym)
         f.write(entry)
     f.close()
     del f # cleanup
