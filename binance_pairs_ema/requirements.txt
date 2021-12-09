@@ -1,2 +1,2 @@
 requests
-bfxhfindicators
+git+https://github.com/bitfinexcom/bfx-hf-indicators-py.git@master
